@@ -12,7 +12,7 @@ import java.io.*;
 public class EchoServerThread implements Runnable
 {
   protected Socket socket;
-  public EchoServerThread(Socket clientSocket, Game game, Player player)
+  public EchoServerThread(Socket clientSocket)
   {
     this.socket = clientSocket;
   }
@@ -37,9 +37,51 @@ public class EchoServerThread implements Runnable
       return;
     }
     String line = null;
-    
-    //pętla główna
-    while(true){
+
+    int size;
+    //Creating game
+      try {
+          out.writeBytes("Give size\n");
+          out.flush();
+          line= brinp.readLine();
+          size=Integer.parseInt(line);
+          Game game = new Game(size);
+          Game.createNewField(game.field);
+          out.writeBytes("Created game of size "+size+"\n");
+          out.flush();
+          String board = GameDisplay.display(game.field);
+          out.writeBytes(board);
+          out.writeBytes("END\n");
+          out.flush();
+          out.writeBytes("Game starts. Player X turn\n");
+          out.flush();
+
+          while (true){
+              line = brinp.readLine();
+              if(game.makeMove(line,game.playerX)){
+                  board = GameDisplay.display(game.field);
+                  out.writeBytes(board);
+                  out.writeBytes("END\n");
+                  out.flush();
+              }
+              out.writeBytes("Player O turn");
+              line = brinp.readLine();
+              if(game.makeMove(line,game.playerO)){
+                  board = GameDisplay.display(game.field);
+                  out.writeBytes(board);
+                  out.writeBytes("END\n");
+                  out.flush();
+              }
+
+
+
+          }
+      } catch (IOException e) {
+          throw new RuntimeException(e);
+      }
+
+
+      /*while(true){
       try{
         line = brinp.readLine();
         System.out.println(threadName + "| Odczytano linię: " + line);
@@ -59,6 +101,6 @@ public class EchoServerThread implements Runnable
         System.out.println(threadName + "| Błąd wejścia-wyjścia." + e);
         return;
       }
-    }
+    }*/
   }
 }

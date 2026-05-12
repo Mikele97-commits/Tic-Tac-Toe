@@ -11,12 +11,11 @@ public class Player {
     BufferedReader input;
     DataOutputStream output;
 
-    public Player(Cell symbol, Socket socket) {
+    public Player(Cell symbol) {
         this.symbol = symbol;
-        this.socket = socket;
-        this.input = new BufferedReader(
+        /*this.input = new BufferedReader(
                 new InputStreamReader(socket.getInputStream())
         );
         this.output = new DataOutputStream(socket.getOutputStream());
-    }
+    */}
 }

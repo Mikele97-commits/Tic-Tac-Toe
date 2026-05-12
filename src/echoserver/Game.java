@@ -1,5 +1,10 @@
 package echoserver;
 
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.Socket;
 import java.util.Arrays;
 import java.util.Scanner;
 
@@ -12,8 +17,8 @@ public class Game {
     int Tiles;
     Cell[][] field;
     GameState state = GameState.WAITING;
-    Player playerX;
-    Player playerY;
+    Player playerX=new Player(Cell.X);
+    Player playerO=new Player(Cell.O);
 
     public Game(int Tiles) {
         this.Tiles = Tiles;
@@ -59,13 +64,28 @@ public class Game {
 
 
 
-    public static void round(){
-        System.out.println("Give size of side");
+    public void round(Socket socket, Game game){
+        BufferedReader brinp = null;
+        DataOutputStream out = null;
+        String threadName = Thread.currentThread().getName();
+
+        try{
+            brinp = new BufferedReader(
+                    new InputStreamReader(
+                            socket.getInputStream()
+                    )
+            );
+            out = new DataOutputStream(socket.getOutputStream());
+        }
+        catch(IOException e){
+            System.out.println(threadName + "| Błąd przy tworzeniu strumieni " + e);
+            return;
+        }
+        /*System.out.println("Give size of side");
+
+        int x = sc.nextInt();*/
         Scanner sc = new Scanner(System.in);
-        int x = sc.nextInt();
-        Player playerX=new Player(Cell.X);
-        Player playerO=new Player(Cell.O);
-        Game game = new Game(x);
+        //Game game = new Game(x);
         createNewField(game.field);
         GameDisplay.display(game.field);
         while(true){

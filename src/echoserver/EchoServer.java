@@ -8,10 +8,9 @@ public class EchoServer {
 
 
     public static void main(String[] args) {
-        Game game=null;
-        ServerSocket serverSocket = null;
+
+       ServerSocket serverSocket = null;
         Socket socket = null;
-        Player player = joinGame(socket);
         try {
             serverSocket = new ServerSocket(6666);
         } catch (IOException e) {
@@ -29,11 +28,10 @@ public class EchoServer {
             }
             System.out.println("Nadeszło połączenie...");
             System.out.println("Parametry połączenia: " + socket);
-            new Thread(new EchoServerThread(socket, game, )).start();
+            new Thread(new EchoServerThread(socket)).start();
         }
-    }
-
-    public void joinGame(Socket socket) {
 
     }
+
+
 }
