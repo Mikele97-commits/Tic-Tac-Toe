@@ -8,6 +8,8 @@ public class GameDisplay {
             case O -> "O";
         };
     }
+
+
     public static String display(Cell[][] field) {
         StringBuilder sb= new StringBuilder();
         //Letters

@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package echoserver;
 
 
@@ -46,35 +42,81 @@ public class EchoServerThread implements Runnable
           line= brinp.readLine();
           size=Integer.parseInt(line);
           Game game = new Game(size);
-          Game.createNewField(game.field);
+          Game.createNewField(game.field);//Taking size, creating game, filling field with EMPTY
+
           out.writeBytes("Created game of size "+size+"\n");
           out.flush();
           String board = GameDisplay.display(game.field);
           out.writeBytes(board);
           out.writeBytes("END\n");
-          out.flush();
-          out.writeBytes("Game starts. Player X turn\n");
-          out.flush();
-
+          out.flush();//Initial display of field
+          out.writeBytes("Game starts.");
+          //Main game loop
           while (true){
-              line = brinp.readLine();
-              if(game.makeMove(line,game.playerX)){
-                  board = GameDisplay.display(game.field);
-                  out.writeBytes(board);
-                  out.writeBytes("END\n");
-                  out.flush();
-              }
-              out.writeBytes("Player O turn");
-              line = brinp.readLine();
-              if(game.makeMove(line,game.playerO)){
-                  board = GameDisplay.display(game.field);
-                  out.writeBytes(board);
-                  out.writeBytes("END\n");
-                  out.flush();
+              out.writeBytes("Player X turn\n");
+              out.flush();
+
+              line = brinp.readLine();//Receive coordinates
+
+              while(!game.makeMove(line,game.playerX)){
+                 out.writeBytes("Invalid move, make proper move!\n");
+                 out.flush();
+                 line = brinp.readLine();
               }
 
 
 
+              board = GameDisplay.display(game.field);
+              out.writeBytes(board);
+              out.writeBytes("END\n");
+              out.flush();//Display board
+
+              if(CheckVictory.check(line,game.field)){
+                  out.writeBytes("Player X wins!\n");
+                  out.flush();
+              }else {
+                  out.writeBytes("NOT\n");
+                  out.flush();
+              }
+
+              if(CheckVictory.tie(game.field)){
+                  out.writeBytes("TIE!\n");
+                  out.flush();
+              }else {
+                  out.writeBytes("NOT\n");
+                  out.flush();
+              }
+
+              out.writeBytes("Player O turn\n");
+              out.flush();//Send Player O turn
+
+              line = brinp.readLine();
+              while(!game.makeMove(line,game.playerO)){
+                  out.writeBytes("Invalid move, make proper move!\n");
+                  out.flush();
+                  line = brinp.readLine();
+              }
+
+              board = GameDisplay.display(game.field);
+              out.writeBytes(board);
+              out.writeBytes("END\n");
+              out.flush();
+
+              if(CheckVictory.check(line,game.field)){
+                  out.writeBytes("Player O wins!\n");
+                  out.flush();
+              }else {
+                  out.writeBytes("NOT\n");
+                  out.flush();
+              }
+
+              if(CheckVictory.tie(game.field)){
+                  out.writeBytes("TIE!\n");
+                  out.flush();
+              }else {
+                  out.writeBytes("NOT\n");
+                  out.flush();
+              }
           }
       } catch (IOException e) {
           throw new RuntimeException(e);

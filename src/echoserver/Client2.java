@@ -1,10 +1,9 @@
 package echoserver;
 
-
 import java.net.*;
 import java.io.*;
 
-public class Client {
+public class Client2 {
 
     public static void main(String args[]) {
         String host = "localhost";
@@ -31,7 +30,7 @@ public class Client {
         }
         System.out.println("Połączono z " + clientSocket);
 
-        //Deklaracje zmiennych strumieniowych 
+        //Deklaracje zmiennych strumieniowych
         String line = null;
         BufferedReader brSockInp = null;
         BufferedReader brLocalInp = null;
@@ -100,3 +99,4 @@ public class Client {
 
     }
 }
+

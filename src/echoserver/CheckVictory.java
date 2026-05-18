@@ -2,7 +2,12 @@ package echoserver;
 
 public class CheckVictory {
 
-    public static boolean check(int y, int x, Cell[][] field) {
+    public static boolean check(String move, Cell[][] field) {
+
+        String xString = move.substring(0, 1);
+        int x = xString.charAt(0)-65;
+        int y = Integer.parseInt(move.substring(1, 2))-1;
+
 
         x = x;
         y = y;
@@ -56,5 +61,16 @@ public class CheckVictory {
             }
         }
         return false;
+    }
+
+    public static boolean tie(Cell[][] field) {
+        for (Cell[] cells : field) {
+            for (Cell cell : cells) {
+                if (cell == Cell.EMPTY) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }

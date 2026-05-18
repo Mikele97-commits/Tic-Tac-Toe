@@ -64,7 +64,7 @@ public class Game {
 
 
 
-    public void round(Socket socket, Game game){
+    /*public void round(Socket socket, Game game){
         BufferedReader brinp = null;
         DataOutputStream out = null;
         String threadName = Thread.currentThread().getName();
@@ -81,9 +81,9 @@ public class Game {
             System.out.println(threadName + "| Błąd przy tworzeniu strumieni " + e);
             return;
         }
-        /*System.out.println("Give size of side");
+        System.out.println("Give size of side");
 
-        int x = sc.nextInt();*/
+        int x = sc.nextInt();
         Scanner sc = new Scanner(System.in);
         //Game game = new Game(x);
         createNewField(game.field);
@@ -124,7 +124,7 @@ public class Game {
             }
         }
 
-    }
+    }*/
 }
 
 enum GameState {
