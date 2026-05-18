@@ -39,6 +39,8 @@ public class Client2 {
 
         //Utworzenie strumieni
         try {
+
+
             out = new DataOutputStream(clientSocket.getOutputStream());
             brSockInp = new BufferedReader(
                     new InputStreamReader(
@@ -52,9 +54,20 @@ public class Client2 {
 
         //Creating game
         try{
-            System.out.println(brSockInp.readLine());//"Give size
-            out.writeBytes(brLocalInp.readLine()+"\n");
-            out.flush();//Giving size
+            String identity=brSockInp.readLine();
+            if(identity.equals("You are Player X")){
+                System.out.println(identity);
+                System.out.println(brSockInp.readLine());//Give size
+                out.writeBytes(brLocalInp.readLine()+"\n");
+                out.flush();//Giving size
+                System.out.println(brSockInp.readLine());//Waiting
+            }else{
+                System.out.println(identity);
+            }
+
+            System.out.println(brSockInp.readLine());
+
+
 
             String boardLine;
             while(!(boardLine = brSockInp.readLine()).equals("END")) {

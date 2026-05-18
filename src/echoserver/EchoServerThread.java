@@ -8,8 +8,11 @@ import java.io.*;
 public class EchoServerThread implements Runnable
 {
   protected Socket socket;
-  public EchoServerThread(Socket clientSocket)
-  {
+  private Game game;
+  private Player player;
+  public EchoServerThread(Socket clientSocket, Game game, Player player) {
+    this.game=game;
+    this.player=player;
     this.socket = clientSocket;
   }
   public void run()
@@ -34,14 +37,33 @@ public class EchoServerThread implements Runnable
     }
     String line = null;
 
-    int size;
     //Creating game
       try {
-          out.writeBytes("Give size\n");
-          out.flush();
+          int size;
+          if(player.symbol==Cell.X){
+              game.playerX.out.writeBytes("You are Player X\n");
+              game.playerX.out.flush();
+              game.playerX.out.writeBytes("Enter size of board's side\n");
+              game.playerX.out.flush();
+              size =Integer.parseInt(game.playerX.input.readLine());
+              game.initField(size);
+              game.playerX.out.writeBytes("Field created. Waiting for player\n");
+              game.playerX.out.flush();
+              synchronized (game){
+                  game.wait();
+              }
+          }else{
+              synchronized(game){
+                  game.notify();
+              }
+              game.playerO.out.writeBytes("You are Player O\n");
+              game.playerO.out.flush();
+          }
+
+          game.sendBoth("Both Players active, game on!\n");
+
           line= brinp.readLine();
           size=Integer.parseInt(line);
-          Game game = new Game(size);
           Game.createNewField(game.field);//Taking size, creating game, filling field with EMPTY
 
           out.writeBytes("Created game of size "+size+"\n");
@@ -118,7 +140,7 @@ public class EchoServerThread implements Runnable
                   out.flush();
               }
           }
-      } catch (IOException e) {
+      } catch (IOException | InterruptedException e) {
           throw new RuntimeException(e);
       }
 
@@ -145,4 +167,5 @@ public class EchoServerThread implements Runnable
       }
     }*/
   }
+
 }

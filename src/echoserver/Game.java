@@ -1,12 +1,8 @@
 package echoserver;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
+
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.Socket;
 import java.util.Arrays;
-import java.util.Scanner;
 
 public class Game {
 
@@ -25,6 +21,24 @@ public class Game {
         tileNumber = Tiles*Tiles;
         field =new Cell[Tiles][Tiles];
 
+    }
+
+    public Game() {
+
+    }
+
+    public void initField(int size) {
+        this.Tiles = size;
+        this.tileNumber = size * size;
+        this.field = new Cell[size][size];
+        createNewField(this.field);
+    }
+
+    public synchronized void  sendBoth(String message) throws IOException {
+        playerX.out.writeBytes(message);
+        playerX.out.flush();
+        playerO.out.writeBytes(message);
+        playerO.out.flush();
     }
 
     public static void createNewField(Cell[][] field) {
