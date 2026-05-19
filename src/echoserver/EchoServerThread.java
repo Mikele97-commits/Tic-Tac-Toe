@@ -10,6 +10,7 @@ public class EchoServerThread implements Runnable
   protected Socket socket;
   private Game game;
   private Player player;
+  private Player currentPlayer;
   public EchoServerThread(Socket clientSocket, Game game, Player player) {
     this.game=game;
     this.player=player;
@@ -55,26 +56,69 @@ public class EchoServerThread implements Runnable
           }else{
               synchronized(game){
                   game.notify();
+                  game.playerO.out.writeBytes("You are Player O\n");
+                  game.playerO.out.flush();
+                  game.sendBoth("Both Players active, game on!\n");
+                  game.displayBoard(game);
               }
-              game.playerO.out.writeBytes("You are Player O\n");
-              game.playerO.out.flush();
+
           }
 
-          game.sendBoth("Both Players active, game on!\n");
-
-          line= brinp.readLine();
-          size=Integer.parseInt(line);
-          Game.createNewField(game.field);//Taking size, creating game, filling field with EMPTY
-
-          out.writeBytes("Created game of size "+size+"\n");
-          out.flush();
-          String board = GameDisplay.display(game.field);
-          out.writeBytes(board);
-          out.writeBytes("END\n");
-          out.flush();//Initial display of field
-          out.writeBytes("Game starts.");
           //Main game loop
-          while (true){
+          while(true){
+
+              if(player.symbol==Cell.X) {
+                  game.sendBoth("Player X turn\n");
+                  line = game.playerX.input.readLine();
+                  while (!game.makeMove(line, game.playerX)) {
+                      out.writeBytes("Invalid move, make proper move!\n");
+                      out.flush();
+                      line = brinp.readLine();
+                  }
+                  game.displayBoard(game);
+
+                  if(CheckVictory.check(line,game.field)){
+                     game.sendBoth("Player X wins!\n");
+                      synchronized(game){ game.notify();}
+                     return;
+                  }else {
+                      out.writeBytes("NOT\n");
+                      out.flush();
+                  }
+                  game.sendBoth("Player O turn\n");
+                  synchronized (game){game.notify();}
+                  synchronized (game){game.wait();}
+
+              }
+
+              if(player.symbol==Cell.O){
+                  synchronized (game){game.wait();}
+                  line = game.playerO.input.readLine();
+                  while (!game.makeMove(line, game.playerO)) {
+                      out.writeBytes("Invalid move, make proper move!\n");
+                      out.flush();
+                      line = brinp.readLine();
+                  }
+                  game.displayBoard(game);
+                  if(CheckVictory.check(line,game.field)){
+                      game.sendBoth("Player O wins!\n");
+                      synchronized(game){ game.notify();}
+                      return;
+                  }else {
+                      out.writeBytes("NOT\n");
+                      out.flush();
+                  }
+                  synchronized (game){game.notify();}
+              }
+
+          }
+
+
+
+
+
+          //Main game loop
+         /* while (true){
               out.writeBytes("Player X turn\n");
               out.flush();
 
@@ -139,33 +183,13 @@ public class EchoServerThread implements Runnable
                   out.writeBytes("NOT\n");
                   out.flush();
               }
-          }
+          }*/
       } catch (IOException | InterruptedException e) {
           throw new RuntimeException(e);
       }
 
 
-      /*while(true){
-      try{
-        line = brinp.readLine();
-        System.out.println(threadName + "| Odczytano linię: " + line);
-        
-        //badanie warunku zakończenia pracy
-        if((line == null) || "quit".equals(line)){
-          System.out.println(threadName + "| Zakończenie pracy z klientem: " + socket);
-          socket.close();
-          return;
-        }
-        else{ //odesłanie danych do klienta
-          out.writeBytes(line + "\n\r");
-          System.out.println(threadName + "| Wysłano linię: " + line);
-        }
-      }
-      catch(IOException e){
-        System.out.println(threadName + "| Błąd wejścia-wyjścia." + e);
-        return;
-      }
-    }*/
+
   }
 
 }

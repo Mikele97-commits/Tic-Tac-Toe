@@ -41,6 +41,16 @@ public class Game {
         playerO.out.flush();
     }
 
+    public synchronized void displayBoard(Game game) throws IOException {
+        String board = GameDisplay.display(game.field);
+        game.playerX.out.writeBytes(board);
+        game.playerX.out.writeBytes("END\n");
+        game.playerX.out.flush();//Initial display of field
+        game.playerO.out.writeBytes(board);
+        game.playerO.out.writeBytes("END\n");
+        game.playerO.out.flush();//Initial display of field
+    }
+
     public static void createNewField(Cell[][] field) {
         for (Cell[] cells : field) {
             Arrays.fill(cells, Cell.EMPTY);
@@ -143,7 +153,7 @@ public class Game {
 
 enum GameState {
     WAITING,
-    PLAYING,
-    FINISHED
+    PLAYING
+
 }
 

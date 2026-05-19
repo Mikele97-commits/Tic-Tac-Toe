@@ -65,8 +65,7 @@ public class Client2 {
                 System.out.println(identity);
             }
 
-            System.out.println(brSockInp.readLine());
-
+            System.out.println(brSockInp.readLine());//Game on
 
 
             String boardLine;
@@ -77,25 +76,56 @@ public class Client2 {
             //Main game loop
             while(true){
                 line=brSockInp.readLine();
-                System.out.println(line);//Display Player X turn
-
-                out.writeBytes(brLocalInp.readLine()+"\n");
-                out.flush();//Send move
-
-                line=brSockInp.readLine();
-                while(line.equals("Invalid move, make proper move!")){
-                    System.out.println(line);
+                System.out.println(line);
+                if(identity.equals("You are Player X")){
                     out.writeBytes(brLocalInp.readLine()+"\n");
-                    out.flush();
+                    out.flush();//Send move
                     line=brSockInp.readLine();
-                }
-                boardLine=line;
-                while(!(boardLine.equals("END"))) {
-                    System.out.println(boardLine);
+                    while(line.equals("Invalid move, make proper move!")){
+                        System.out.println(line);
+                        out.writeBytes(brLocalInp.readLine()+"\n");
+                        out.flush();
+                        line=brSockInp.readLine();
+                    }
+                    boardLine=line;
+                    while(!(boardLine.equals("END"))) {
+                        System.out.println(boardLine);
+                        boardLine=brSockInp.readLine();
+                    }
+                    line=brSockInp.readLine();
+                    System.out.println(line);//playerO turn
+                }else{
                     boardLine=brSockInp.readLine();
-                }//Display field
+                    while(!(boardLine.equals("END"))) {
+                        System.out.println(boardLine);
+                        boardLine=brSockInp.readLine();
+                    }//display board
+                    line=brSockInp.readLine();
+                    System.out.println(line);//player O turn
+                }
 
-                String checkVictory = brSockInp.readLine();
+                if(identity.equals("You are Player O")){
+                    out.writeBytes(brLocalInp.readLine()+"\n");
+                    out.flush();//Send move
+                    line=brSockInp.readLine();
+                    while(line.equals("Invalid move, make proper move!")){
+                        System.out.println(line);
+                        out.writeBytes(brLocalInp.readLine()+"\n");
+                        out.flush();
+                        line=brSockInp.readLine();
+                    }
+                    boardLine=line;
+                    while(!(boardLine.equals("END"))) {
+                        System.out.println(boardLine);
+                        boardLine=brSockInp.readLine();
+                    }
+                }
+
+
+
+
+
+                /*String checkVictory = brSockInp.readLine();
                 if(checkVictory.equals("Player X wins!") || checkVictory.equals("Player O wins!")){
                     System.out.println(checkVictory);
                     return;
@@ -104,7 +134,7 @@ public class Client2 {
                 if(checkTie.equals("TIE!")){
                     System.out.println(checkTie);
                     return;
-                }
+                }*/
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -112,4 +142,3 @@ public class Client2 {
 
     }
 }
-
