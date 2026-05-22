@@ -40,59 +40,70 @@ public class EchoServerThread implements Runnable
 
     //Creating game
       try {
-          int size;
+          int size=0;
+          System.out.println("Thread for " + player.symbol + " got game: " + game.hashCode());
+
           if(player.symbol==Cell.X){
-              game.playerX.out.writeBytes("You are Player X\n");
-              game.playerX.out.flush();
-              game.playerX.out.writeBytes("Enter size of board's side\n");
-              game.playerX.out.flush();
-              size =Integer.parseInt(game.playerX.input.readLine());
+              game.sendMessage("You are Player X", game.playerX);
+              game.sendMessage("Enter size of board's side", game.playerX);
+              size = Integer.parseInt(game.playerX.input.readLine());
               game.initField(size);
-              game.playerX.out.writeBytes("Field created. Waiting for player\n");
-              game.playerX.out.flush();
+              game.sendMessage("Field created. Waiting for player", game.playerX);
               synchronized (game){
                   game.wait();
               }
           }else{
               synchronized(game){
                   game.notify();
-                  game.playerO.out.writeBytes("You are Player O\n");
-                  game.playerO.out.flush();
+                  game.sendMessage("You are Player O",game.playerO);
                   game.sendBoth("Both Players active, game on!\n");
-                  game.displayBoard(game);
+                  game.wait();
               }
-
           }
+
 
           //Main game loop
           while(true){
+              if(player.symbol==Cell.X){
+                  game.sendBoth("Player X turn");
+              } else{
+                  game.sendBoth("Player O turn");
+              }//Sends currentPlayer
+
+              game.displayBoard(game);
+
+
 
               if(player.symbol==Cell.X) {
-                  game.sendBoth("Player X turn\n");
                   line = game.playerX.input.readLine();
                   while (!game.makeMove(line, game.playerX)) {
-                      out.writeBytes("Invalid move, make proper move!\n");
-                      out.flush();
+                      game.sendMessage("Invalid move, make proper move!", game.playerX);
                       line = brinp.readLine();
                   }
+
                   game.displayBoard(game);
 
-                  if(CheckVictory.check(line,game.field)){
+                if(CheckVictory.check(line,game.field)){
+                     synchronized(game){ game.notify();}
                      game.sendBoth("Player X wins!\n");
-                      synchronized(game){ game.notify();}
+                     game.displayBoard(game);
                      return;
-                  }else {
-                      out.writeBytes("NOT\n");
-                      out.flush();
                   }
-                  game.sendBoth("Player O turn\n");
+
+                if(CheckVictory.tie(game.field)){
+                    synchronized(game){ game.notify();}
+                    game.sendBoth("TIE!\n");
+                    game.displayBoard(game);
+                    return;
+                }else {
+                    game.sendMessage("NOT", game.playerX);
+                }
+
                   synchronized (game){game.notify();}
                   synchronized (game){game.wait();}
-
               }
 
               if(player.symbol==Cell.O){
-                  synchronized (game){game.wait();}
                   line = game.playerO.input.readLine();
                   while (!game.makeMove(line, game.playerO)) {
                       out.writeBytes("Invalid move, make proper move!\n");
@@ -100,90 +111,29 @@ public class EchoServerThread implements Runnable
                       line = brinp.readLine();
                   }
                   game.displayBoard(game);
+
                   if(CheckVictory.check(line,game.field)){
-                      game.sendBoth("Player O wins!\n");
                       synchronized(game){ game.notify();}
+                      game.sendBoth("Player X wins!\n");
+                      game.displayBoard(game);
+                      return;
+                  }
+
+                  if(CheckVictory.tie(game.field)){
+                      synchronized(game){ game.notify();}
+                      game.sendBoth("TIE!\n");
+                      game.displayBoard(game);
                       return;
                   }else {
-                      out.writeBytes("NOT\n");
-                      out.flush();
+                      game.sendMessage("NOT", game.playerX);
                   }
+
                   synchronized (game){game.notify();}
+                  synchronized (game){game.wait();}
               }
 
           }
 
-
-
-
-
-          //Main game loop
-         /* while (true){
-              out.writeBytes("Player X turn\n");
-              out.flush();
-
-              line = brinp.readLine();//Receive coordinates
-
-              while(!game.makeMove(line,game.playerX)){
-                 out.writeBytes("Invalid move, make proper move!\n");
-                 out.flush();
-                 line = brinp.readLine();
-              }
-
-
-
-              board = GameDisplay.display(game.field);
-              out.writeBytes(board);
-              out.writeBytes("END\n");
-              out.flush();//Display board
-
-              if(CheckVictory.check(line,game.field)){
-                  out.writeBytes("Player X wins!\n");
-                  out.flush();
-              }else {
-                  out.writeBytes("NOT\n");
-                  out.flush();
-              }
-
-              if(CheckVictory.tie(game.field)){
-                  out.writeBytes("TIE!\n");
-                  out.flush();
-              }else {
-                  out.writeBytes("NOT\n");
-                  out.flush();
-              }
-
-              out.writeBytes("Player O turn\n");
-              out.flush();//Send Player O turn
-
-              line = brinp.readLine();
-              while(!game.makeMove(line,game.playerO)){
-                  out.writeBytes("Invalid move, make proper move!\n");
-                  out.flush();
-                  line = brinp.readLine();
-              }
-
-              board = GameDisplay.display(game.field);
-              out.writeBytes(board);
-              out.writeBytes("END\n");
-              out.flush();
-
-              if(CheckVictory.check(line,game.field)){
-                  out.writeBytes("Player O wins!\n");
-                  out.flush();
-              }else {
-                  out.writeBytes("NOT\n");
-                  out.flush();
-              }
-
-              if(CheckVictory.tie(game.field)){
-                  out.writeBytes("TIE!\n");
-                  out.flush();
-              }else {
-                  out.writeBytes("NOT\n");
-                  out.flush();
-              }
-          }*/
       } catch (IOException | InterruptedException e) {
           throw new RuntimeException(e);
       }

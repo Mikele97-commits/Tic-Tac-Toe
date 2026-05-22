@@ -7,10 +7,6 @@ public class CheckVictory {
         String xString = move.substring(0, 1);
         int x = xString.charAt(0)-65;
         int y = Integer.parseInt(move.substring(1, 2))-1;
-
-
-        x = x;
-        y = y;
         int startingX = x;
         int startingY = y;
         Cell symbol = field[y][x];
@@ -53,7 +49,6 @@ public class CheckVictory {
                     x = startingX - direction[1];
                     if (y >= 0 && y < field.length && x >= 0 && x < field[y].length) {
                         if (field[y][x] == symbol) {
-                            System.out.println("VICTORIA");
                             return true;
                         }
                     }

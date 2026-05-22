@@ -6,6 +6,7 @@ import java.util.Arrays;
 
 public class Game {
 
+    String ID;
     int tieCounter=0;
     int tileNumber;
     int lastX;
@@ -27,6 +28,10 @@ public class Game {
 
     }
 
+    public void setID(String ID) {
+        this.ID = ID;
+    }
+
     public void initField(int size) {
         this.Tiles = size;
         this.tileNumber = size * size;
@@ -34,10 +39,15 @@ public class Game {
         createNewField(this.field);
     }
 
+    public synchronized void sendMessage(String message, Player player) throws IOException {
+        player.out.writeBytes(message+"\n");
+        player.out.flush();
+    }
+
     public synchronized void  sendBoth(String message) throws IOException {
-        playerX.out.writeBytes(message);
+        playerX.out.writeBytes(message+"\n");
         playerX.out.flush();
-        playerO.out.writeBytes(message);
+        playerO.out.writeBytes(message+"\n");
         playerO.out.flush();
     }
 
@@ -85,70 +95,6 @@ public class Game {
 
         return true;
     }
-
-
-
-    /*public void round(Socket socket, Game game){
-        BufferedReader brinp = null;
-        DataOutputStream out = null;
-        String threadName = Thread.currentThread().getName();
-
-        try{
-            brinp = new BufferedReader(
-                    new InputStreamReader(
-                            socket.getInputStream()
-                    )
-            );
-            out = new DataOutputStream(socket.getOutputStream());
-        }
-        catch(IOException e){
-            System.out.println(threadName + "| Błąd przy tworzeniu strumieni " + e);
-            return;
-        }
-        System.out.println("Give size of side");
-
-        int x = sc.nextInt();
-        Scanner sc = new Scanner(System.in);
-        //Game game = new Game(x);
-        createNewField(game.field);
-        GameDisplay.display(game.field);
-        while(true){
-            System.out.println("Player X:");
-            String move = sc.next();
-            while (!game.makeMove(move, playerX)) {
-                System.out.println("Invalid move, please try again");
-                move = sc.next();
-            }
-            GameDisplay.display(game.field);
-            if (CheckVictory.check(game.lastY, game.lastX, game.field )){
-                System.out.println("Player X wins!");
-                return;
-            }
-            game.tieCounter++;
-            if (game.tieCounter==game.tileNumber){
-                System.out.println("DRAW");
-                return;
-            }
-
-            System.out.println("Player O:");
-            move = sc.next();
-            while (!game.makeMove(move, playerO)) {
-                System.out.println("Invalid move, please try again");
-                move = sc.next();
-            }
-            GameDisplay.display(game.field);
-            if (CheckVictory.check(game.lastY, game.lastX, game.field )){
-                System.out.println("Player Y wins!");
-                return;
-            }
-            game.tieCounter++;
-            if (game.tieCounter==game.tileNumber){
-                System.out.println("DRAW");
-                return;
-            }
-        }
-
-    }*/
 }
 
 enum GameState {

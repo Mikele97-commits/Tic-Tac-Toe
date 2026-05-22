@@ -8,6 +8,8 @@ public class EchoServer {
     Game waitingGame= null;
     Player player;
     Game lastGame=null;
+    Lobby lobby=new Lobby();
+    Game game;
     public void startServer() {
         ServerSocket serverSocket = null;
         Socket socket = null;
@@ -31,11 +33,12 @@ public class EchoServer {
             System.out.println("Parametry połączenia: " + socket);
             Player player = null;
             try {
-                player = joinGame(socket);
+                player = lobby.joinGame(socket);
+                game = lobby.games.get(player.roomID);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-            new Thread(new EchoServerThread(socket, lastGame, player )).start();
+            new Thread(new EchoServerThread(socket, game, player )).start();
         }
     }
 
@@ -44,26 +47,4 @@ public class EchoServer {
        new EchoServer().startServer();
 
     }
-
-    public synchronized Player joinGame(Socket socket) throws IOException {
-        if(waitingGame == null) {
-            waitingGame=new Game();
-            lastGame=waitingGame;
-            waitingGame.playerX=new Player(socket, Cell.X);
-            return waitingGame.playerX;
-        }else{
-            Game game=waitingGame;
-            if(game.state!=GameState.WAITING){
-                System.out.println("Game full");
-            }
-            waitingGame.playerO=new Player(socket, Cell.O);
-            lastGame=waitingGame;
-            waitingGame=null;
-            game.state=GameState.PLAYING;
-            return game.playerO;
-        }
-
-    }
-
-
 }
