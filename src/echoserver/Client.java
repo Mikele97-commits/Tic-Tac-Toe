@@ -6,7 +6,7 @@ import java.io.*;
 
 public class Client {
 
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         String host = "localhost";
         int port = 0;
         try {
@@ -53,53 +53,63 @@ public class Client {
 
         //Creating game
         try{
-            String identity=brSockInp.readLine();//Reading if player is X or O
-            if(identity.equals("You are Player X")){
-                System.out.println(identity);
-                readMessage(brSockInp);//Enter size of board's side
-                sendMessage(out, brLocalInp);
-                readMessage(brSockInp);//Field created. Waiting for player
+            //Session loop
+            while(true) {
+                System.out.println("Beginning of session loop");
+                String identity = brSockInp.readLine();//Reading if player is X or O
+                if (identity.equals("You are Player X")) {
+                    System.out.println(identity);
+                    readMessage(brSockInp);//Enter size of board's side
+                    sendMessage(out, brLocalInp);
+                    readMessage(brSockInp);//Field created. Waiting for player
 
-            }else{
-                System.out.println(identity);
-            }
-            readMessage(brSockInp);//Both Players active, game on!
-            if(identity.equals("You are Player O")){
-                System.out.println("Player X turn");
-            }
-            String currentPlayer;
-            //Main game loop
-            while(true){
-                currentPlayer=brSockInp.readLine();
-                if( (currentPlayer.equals("Player X turn")&&identity.equals("You are Player X") )||
-                        ( currentPlayer.equals("Player O turn")&&identity.equals("You are Player O") ) ){
+                } else {
+                    System.out.println(identity);
+                }
+                readMessage(brSockInp);//Both Players active, game on!
+                if (identity.equals("You are Player O")) {
+                    System.out.println("Player X turn");
+                }
+                String currentPlayer;
 
-                    readBoard(brSockInp);
-                    System.out.println(currentPlayer);
-                    sendMessage(out,brLocalInp);//Send move
-
-                    line=checkValid(out, brSockInp,brLocalInp);//Check if move is valid
-                    readBoard(line,brSockInp);
-
-                String checkResult=brSockInp.readLine();
-                    if(checkResult.equals("Player X wins!") || checkResult.equals("Player O wins!") || checkResult.equals("TIE!")){
+                //Main game loop
+                while (true) {
+                    currentPlayer = brSockInp.readLine();
+                    if(currentPlayer.equals("Player X wins!")||currentPlayer.equals("Player O wins!")||currentPlayer.equals("TIE!")) {
                         readBoard(brSockInp);
-                        System.out.println(checkResult);
+                        System.out.println(currentPlayer);
                         break;
                     }
+                    if ((currentPlayer.equals("Player X turn") && identity.equals("You are Player X")) ||
+                            (currentPlayer.equals("Player O turn") && identity.equals("You are Player O"))) {
 
-                    if(identity.equals("You are Player X")){
-                        System.out.println("Player O turn");
-                    } else {
-                        System.out.println("Player X turn");
+                        readBoard(brSockInp);
+                        System.out.println(currentPlayer);
+                        sendMessage(out, brLocalInp);//Send move
+
+                        line = checkValid(out, brSockInp, brLocalInp);//Check if move is valid
+                        readBoard(line, brSockInp);
+
+
+
+                        if (identity.equals("You are Player X")) {
+                            System.out.println("Player O turn");
+                        } else {
+                            System.out.println("Player X turn");
+                        }
+
                     }
 
-                } else if(currentPlayer.equals("Player X wins!") || currentPlayer.equals("Player O wins!") || currentPlayer.equals("TIE!")){
-                    readBoard(brSockInp);
-                    System.out.println(currentPlayer);
-                    break; //For if other client's move leads to victory/tie
                 }
 
+                readMessage(brSockInp);//Ask for rematch
+                sendMessage(out, brLocalInp);
+                String rematch= brSockInp.readLine();
+                if(rematch.equals("No rematch :c. Bye bye")) {
+                    break;
+                }
+                readMessage(brSockInp);//Read new symbol
+                System.out.println(rematch);
 
             }
 
@@ -139,7 +149,6 @@ public class Client {
             boardLine=brSockInp.readLine();
         }
     }
-
     static void readBoard(String line, BufferedReader brSockInp) throws IOException {
         String boardLine = line;
         while(!(boardLine.equals("END"))) {

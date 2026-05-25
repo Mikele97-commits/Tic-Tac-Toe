@@ -12,16 +12,15 @@ public class Lobby {
 
     public synchronized Player joinGame(Socket socket) throws IOException {
         for (Game game : games.values()) {
-            if(game.state==GameState.WAITING){
+            if(game.state==GameState.CREATING||game.state==GameState.CREATED) {
                 game.playerO=new Player(socket, Cell.O,game.ID);
-                game.state=GameState.PLAYING;
                 return game.playerO;
             }
         }
         String roomID= UUID.randomUUID().toString();
         Game game=new Game();
         game.ID=roomID;
-        game.state=GameState.WAITING;
+        game.state=GameState.CREATING;
         games.put(roomID, game);
         game.playerX=new Player(socket, Cell.X,game.ID);
         return game.playerX;

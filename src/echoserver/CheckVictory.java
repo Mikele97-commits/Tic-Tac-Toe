@@ -3,7 +3,7 @@ package echoserver;
 public class CheckVictory {
 
     public static boolean check(String move, Cell[][] field) {
-
+        move = move.toUpperCase();
         String xString = move.substring(0, 1);
         int x = xString.charAt(0)-65;
         int y = Integer.parseInt(move.substring(1, 2))-1;

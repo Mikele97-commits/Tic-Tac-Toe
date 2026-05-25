@@ -5,7 +5,9 @@ import java.io.IOException;
 import java.util.Arrays;
 
 public class Game {
-
+    Boolean gameOver = false;
+    String playerXAnswer;
+    String playerOAnswer;
     String ID;
     int tieCounter=0;
     int tileNumber;
@@ -13,7 +15,7 @@ public class Game {
     int lastY;
     int Tiles;
     Cell[][] field;
-    GameState state = GameState.WAITING;
+    GameState state = null;
     Player playerX=new Player(Cell.X);
     Player playerO=new Player(Cell.O);
 
@@ -72,6 +74,7 @@ public class Game {
             System.out.println("Invalid input");
             return false;
         }
+        move=move.toUpperCase();
         String xString = move.substring(0, 1);
         int x = xString.charAt(0)-65;
         if (x<0 || x>Tiles - 1) {
@@ -98,7 +101,8 @@ public class Game {
 }
 
 enum GameState {
-    WAITING,
+    CREATING,
+    CREATED,
     PLAYING
 
 }
