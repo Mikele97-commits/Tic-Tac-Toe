@@ -7,6 +7,7 @@ import java.io.*;
 public class Client {
 
     public static void main(String[] args) {
+        User user;
         String host = "localhost";
         int port = 0;
         try {
@@ -32,7 +33,7 @@ public class Client {
         System.out.println("Połączono z " + clientSocket);
 
         //Deklaracje zmiennych strumieniowych 
-        String line = null;
+        String line;
         BufferedReader brSockInp = null;
         BufferedReader brLocalInp = null;
         DataOutputStream out = null;
@@ -51,7 +52,32 @@ public class Client {
             System.exit(-1);
         }
 
-        //Creating game
+        //Register/login
+
+        try {
+                readMessage(brSockInp);//Login/register?
+                while (true) {
+                    String answer = brLocalInp.readLine();
+                    if (!(answer.equals("L") || answer.equals("R"))) {
+                        System.out.println("Wrong input");
+                    } else {
+                        out.writeBytes(answer + "\n");
+                        out.flush();
+                        if (answer.equals("L")) {
+                            login(brSockInp, brLocalInp, out);
+                        } else {
+                            register(brSockInp, brLocalInp, out);
+                        }
+                        break;
+                    }
+                }
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+
+        //Game
         try{
             //Session loop
             while(true) {
@@ -64,7 +90,7 @@ public class Client {
                     readMessage(brSockInp);//Field created. Waiting for player
 
                 } else {
-                    System.out.println(identity);
+                    System.out.println(identity+"\nWaiting for game creation");
                 }
                 readMessage(brSockInp);//Both Players active, game on!
                 if (identity.equals("You are Player O")) {
@@ -155,5 +181,46 @@ public class Client {
             System.out.println(boardLine);
             boardLine=brSockInp.readLine();
         }
+    }
+    static void login(BufferedReader brSockInp, BufferedReader brLocalInp, DataOutputStream out) throws IOException {
+        readMessage(brSockInp);//"Enter your username"
+        while (true) {
+            sendMessage(out, brLocalInp);
+            String correct = brSockInp.readLine();
+            if (correct.equals("Good")) {
+                break;
+            }else{
+                System.out.println(correct);
+            }
+        }
+        readMessage(brSockInp);//"Enter password"
+        sendMessage(out, brLocalInp);
+        while (true) {
+            String line= brSockInp.readLine();
+            System.out.println(line);
+            if (line.equals("Password correct")) {
+                break;
+            }else {
+                sendMessage(out, brLocalInp);
+            }
+
+        }
+
+    }
+
+    static void register(BufferedReader brSockInp, BufferedReader brLocalInp, DataOutputStream out) throws IOException {
+        readMessage(brSockInp);//"Enter your username"
+        while (true) {
+            sendMessage(out, brLocalInp);
+            String correct = brSockInp.readLine();
+            if (correct.equals("Good")) {
+                break;
+            }else{
+                System.out.println(correct);
+            }
+        }
+        readMessage(brSockInp);//"Enter password"
+        sendMessage(out, brLocalInp);
+        readMessage(brSockInp);//Account correctly created
     }
 }

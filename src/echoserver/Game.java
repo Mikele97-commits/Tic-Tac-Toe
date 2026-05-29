@@ -9,7 +9,6 @@ public class Game {
     String playerXAnswer;
     String playerOAnswer;
     String ID;
-    int tieCounter=0;
     int tileNumber;
     int lastX;
     int lastY;
@@ -23,7 +22,6 @@ public class Game {
         this.Tiles = Tiles;
         tileNumber = Tiles*Tiles;
         field =new Cell[Tiles][Tiles];
-
     }
 
     public Game() {

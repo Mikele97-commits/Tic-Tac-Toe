@@ -29,7 +29,6 @@ public class CheckVictory {
                 if (field[y][x] == symbol)
                     correct++;
                 else {
-                    correct = 0;
                     break;
                 }
                 if (correct == 3) {

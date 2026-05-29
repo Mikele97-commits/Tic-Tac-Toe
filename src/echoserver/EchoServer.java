@@ -1,13 +1,11 @@
 
 package echoserver;
 
+
 import java.net.*;
 import java.io.*;
 
 public class EchoServer {
-    Game waitingGame= null;
-    Player player;
-    Game lastGame=null;
     Lobby lobby=new Lobby();
     Game game;
     public void startServer() {
@@ -31,7 +29,7 @@ public class EchoServer {
             }
             System.out.println("Nadeszło połączenie...");
             System.out.println("Parametry połączenia: " + socket);
-            Player player = null;
+            Player player;
             try {
                 player = lobby.joinGame(socket);
                 game = lobby.games.get(player.roomID);
@@ -43,8 +41,10 @@ public class EchoServer {
     }
 
 
-    public static void main(String[] args) {
-       new EchoServer().startServer();
+    public static void main(String[] args) throws IOException {
+
+        Database.create();
+        new EchoServer().startServer();
 
     }
 }
