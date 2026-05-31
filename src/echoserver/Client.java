@@ -55,22 +55,24 @@ public class Client {
         //Register/login
 
         try {
+
+            while (true) {
                 readMessage(brSockInp);//Login/register?
-                while (true) {
-                    String answer = brLocalInp.readLine();
-                    if (!(answer.equals("L") || answer.equals("R"))) {
-                        System.out.println("Wrong input");
-                    } else {
-                        out.writeBytes(answer + "\n");
-                        out.flush();
-                        if (answer.equals("L")) {
-                            login(brSockInp, brLocalInp, out);
-                        } else {
-                            register(brSockInp, brLocalInp, out);
-                        }
+                String answer = brLocalInp.readLine();
+                if (!(answer.equals("L") || answer.equals("R"))) {
+                    System.out.println("Wrong input");
+                } else {
+                    out.writeBytes(answer + "\n");
+                    out.flush();
+                    if (answer.equals("L")) {
+                        login(brSockInp, brLocalInp, out);
                         break;
+                    } else {
+                        register(brSockInp, brLocalInp, out);
                     }
+
                 }
+            }
 
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -132,6 +134,7 @@ public class Client {
                 sendMessage(out, brLocalInp);
                 String rematch= brSockInp.readLine();
                 if(rematch.equals("No rematch :c. Bye bye")) {
+                    System.out.println(rematch);
                     break;
                 }
                 readMessage(brSockInp);//Read new symbol
@@ -203,8 +206,8 @@ public class Client {
             }else {
                 sendMessage(out, brLocalInp);
             }
-
         }
+        readMessage(brSockInp);
 
     }
 

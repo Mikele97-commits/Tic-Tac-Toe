@@ -1,4 +1,3 @@
-
 package echoserver;
 
 
@@ -12,104 +11,105 @@ public class EchoServerThread implements Runnable
 {
     Properties prop = new Properties();
 
-  protected Socket socket;
-  private final Game game;
-  private final Player player;
-  User user;
-  public EchoServerThread(Socket clientSocket, Game game, Player player) {
-    this.game=game;
-    this.player=player;
-    this.socket = clientSocket;
-  }
-  public void run()
-  {
-    //Deklaracje zmiennych
-    BufferedReader brinp;
-    DataOutputStream out;
-    String threadName = Thread.currentThread().getName();
-      try {
-          prop.load(new FileInputStream("database.db"));
-      } catch (IOException e) {
-          throw new RuntimeException(e);
-      }
-
-      //inicjalizacja strumieni
-    try{
-      brinp = new BufferedReader(
-        new InputStreamReader(
-          socket.getInputStream()
-        )
-      );
-      out = new DataOutputStream(socket.getOutputStream());
+    protected Socket socket;
+    private final Game game;
+    private final Player player;
+    User user;
+    public EchoServerThread(Socket clientSocket, Game game, Player player) {
+        this.game=game;
+        this.player=player;
+        this.socket = clientSocket;
     }
-    catch(IOException e){
-      System.out.println(threadName + "| Błąd przy tworzeniu strumieni " + e);
-      return;
-    }
-    //Register/Login
-      try {
-          while(true) {
-              game.sendMessage("Would you like to (L)ogin or (R)egister", player);
-              String response = brinp.readLine();
-              if (response.equals("L")) {
-                  login(brinp);
-                  break;
-              } else {
-                  register(brinp);
-              }
-          }
-      } catch (IOException e) {
-          throw new RuntimeException(e);
-      }
-      //Game
-      try {
-        while (true) {
-            gameInit();
-            gameLoop(brinp, out);
+    public void run()
+    {
+        //Deklaracje zmiennych
+        BufferedReader brinp;
+        DataOutputStream out;
+        String threadName = Thread.currentThread().getName();
+        try {
+            prop.load(new FileInputStream("database.db"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
-
-            if (player.symbol == Cell.X) {
-                game.sendBoth("Do you want to play again?");
-                game.playerXAnswer = game.playerX.input.readLine();
-                synchronized (game) {game.notify();}
-                synchronized (game) {game.wait();}
-            } else {
-                synchronized (game) {game.wait();}
-                game.playerOAnswer = game.playerO.input.readLine();
-                synchronized (game) {game.notify();}
+        //inicjalizacja strumieni
+        try{
+            brinp = new BufferedReader(
+                    new InputStreamReader(
+                            socket.getInputStream()
+                    )
+            );
+            out = new DataOutputStream(socket.getOutputStream());
+        }
+        catch(IOException e){
+            System.out.println(threadName + "| Błąd przy tworzeniu strumieni " + e);
+            return;
+        }
+        //Register/Login
+        try {
+            while(true) {
+                game.sendMessage("Would you like to (L)ogin or (R)egister", player);
+                String response = brinp.readLine();
+                if (response.equals("L")) {
+                    login(brinp);
+                    break;
+                } else {
+                    register(brinp);
+                }
             }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        //Game
+        try {
+            while (true) {
+                gameInit();
+                gameLoop(brinp, out);
 
-            if (!(game.playerXAnswer.equalsIgnoreCase("y") && game.playerOAnswer.equalsIgnoreCase("y"))) {
-                game.sendBoth("No rematch :c. Bye bye");
-                break;
-            }else {
-                if (player.symbol == Cell.O) {
-
-                    game.sendMessage("REMATCH!",player);
-                    game.sendMessage("you had symbol O, now you have symbol X", player);
-                    player.symbol = Cell.X;
-                    game.gameOver = false;
-                    game.state=GameState.CREATING;
-                    Player temp = game.playerX;
-                    game.playerX = game.playerO;
-                    game.playerO = temp;
-                    synchronized (game) {
-                        game.notify();
-                    }
-
-                }else{
+                if (player.symbol == Cell.X) {
+                    game.sendBoth("Do you want to play again?");
+                    game.playerXAnswer = game.playerX.input.readLine();
+                    System.out.println("Player X answer: " + game.playerXAnswer);
+                    synchronized (game) {game.notify();}
                     synchronized (game) {game.wait();}
-                    game.sendMessage("REMATCH!",player);
-                    game.sendMessage("you had symbol X, now you have symbol O", player);
-                    player.symbol = Cell.O;
+                } else {
+                    synchronized (game) {game.wait();}
+                    game.playerOAnswer = game.playerO.input.readLine();
+                    System.out.println("Player O answer: " + game.playerOAnswer);
+                    synchronized (game) {game.notify();}
                 }
 
+                if (!(game.playerXAnswer.equalsIgnoreCase("y") && game.playerOAnswer.equalsIgnoreCase("y"))) {
+                    game.sendBoth("No rematch :c. Bye bye");
+                    break;
+                }else {
+                    if (player.symbol == Cell.O) {
+
+                        game.sendMessage("REMATCH!",player);
+                        game.sendMessage("you had symbol O, now you have symbol X", player);
+                        player.symbol = Cell.X;
+                        game.gameOver = false;
+                        game.state=GameState.CREATING;
+                        Player temp = game.playerX;
+                        game.playerX = game.playerO;
+                        game.playerO = temp;
+                        synchronized (game) {
+                            game.notify();
+                        }
+
+                    }else{
+                        synchronized (game) {game.wait();}
+                        game.sendMessage("REMATCH!",player);
+                        game.sendMessage("you had symbol X, now you have symbol O", player);
+                        player.symbol = Cell.O;
+                    }
+
+                }
             }
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException(e);
         }
-      } catch (IOException | InterruptedException e) {
-          throw new RuntimeException(e);
-      }
-  }
+    }
     public void gameInit() throws IOException, InterruptedException {
         int size;
         System.out.println("Thread for " + player.symbol + " got game: " + game.hashCode());
@@ -161,18 +161,19 @@ public class EchoServerThread implements Runnable
                 game.displayBoard(game);
 
                 if(CheckVictory.check(line,game.field)){
-                    synchronized(game){ game.notify();}
-                    game.sendBoth("Player X wins!");
-                    game.displayBoard(game);
                     game.gameOver=true;
+                    game.sendBoth("Player X wins!");
+                    Database.addPoints(user.username, 3);
+                    game.displayBoard(game);
+                    synchronized(game){ game.notify();}
                     break;
                 }
 
                 if(CheckVictory.tie(game.field)){
-                    synchronized(game){ game.notify();}
                     game.sendBoth("TIE!");
                     game.displayBoard(game);
                     game.gameOver=true;
+                    synchronized(game){ game.notify();}
                     break;
                 }
 
@@ -190,19 +191,19 @@ public class EchoServerThread implements Runnable
                 game.displayBoard(game);
 
                 if(CheckVictory.check(line,game.field)){
-                    synchronized(game){ game.notify();}
+                    game.gameOver=true;
                     game.sendBoth("Player O wins!");
                     Database.addPoints(user.username, 3);
                     game.displayBoard(game);
-                    game.gameOver=true;
+                    synchronized(game){ game.notify();}
                     break;
                 }
 
                 if(CheckVictory.tie(game.field)){
-                    synchronized(game){ game.notify();}
                     game.sendBoth("TIE!");
                     game.displayBoard(game);
                     game.gameOver=true;
+                    synchronized(game){ game.notify();}
                     break;
                 }
                 synchronized (game){game.notify();}
@@ -217,6 +218,7 @@ public class EchoServerThread implements Runnable
     }
 
     public void login(BufferedReader brinp) throws IOException {
+        prop.load(new FileInputStream("database.db"));
         game.sendMessage("Enter your Username", player);
         String username = brinp.readLine();
         while(true){
@@ -245,6 +247,7 @@ public class EchoServerThread implements Runnable
             }
         }
         user=new User(username,points);
+        game.sendMessage(username+" logged in. You have "+user.getPoints()+" points.", player);
     }
     public void register(BufferedReader brinp) throws IOException {
         game.sendMessage("Enter your Username", player);
@@ -253,10 +256,10 @@ public class EchoServerThread implements Runnable
             if(prop.getProperty(username)!=null){
                 game.sendMessage("This username already registered. Try different username", player);
                 username = brinp.readLine();
-                }else{
-                    game.sendMessage("Good", player);
-                    break;
-                }
+            }else{
+                game.sendMessage("Good", player);
+                break;
+            }
         }
 
         game.sendMessage("Enter your Password", player);
