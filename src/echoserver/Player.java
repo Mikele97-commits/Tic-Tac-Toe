@@ -17,25 +17,6 @@ public class Player {
         this.symbol = symbol;
         }
 
-    public Player(Socket socket) {
-        this.socket = socket;
-    }
-
-
-    public Cell getSymbol() {
-        return symbol;
-    }
-
-    public void setRoomID(String roomID) {
-        this.roomID = roomID;
-    }
-
-    public Player(Socket socket, Cell symbol) throws IOException {
-        this.socket = socket;
-        this.symbol = symbol;
-        this.input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        this.out = new DataOutputStream(socket.getOutputStream());
-    }
 
     public Player(Socket socket, Cell symbol, String roomID) throws IOException {
         this.socket = socket;

@@ -10,18 +10,16 @@ public class Game {
     String playerOAnswer;
     String ID;
     int tileNumber;
-    int lastX;
-    int lastY;
-    int Tiles;
+    int tiles;
     Cell[][] field;
     GameState state = null;
     Player playerX=new Player(Cell.X);
     Player playerO=new Player(Cell.O);
 
-    public Game(int Tiles) {
-        this.Tiles = Tiles;
-        tileNumber = Tiles*Tiles;
-        field =new Cell[Tiles][Tiles];
+    public Game(int tiles) {
+        this.tiles = tiles;
+        tileNumber = tiles*tiles;
+        field =new Cell[tiles][tiles];
     }
 
     public Game() {
@@ -33,7 +31,7 @@ public class Game {
     }
 
     public void initField(int size) {
-        this.Tiles = size;
+        this.tiles = size;
         this.tileNumber = size * size;
         this.field = new Cell[size][size];
         createNewField(this.field);
@@ -75,12 +73,12 @@ public class Game {
         move=move.toUpperCase();
         String xString = move.substring(0, 1);
         int x = xString.charAt(0)-65;
-        if (x<0 || x>Tiles - 1) {
+        if (x<0 || x> tiles - 1) {
             System.out.println("Invalid input x, out of bounds");
             return false;
         }
         int y = Integer.parseInt(move.substring(1, 2))-1;
-        if (y<0 || y>Tiles - 1) {
+        if (y<0 || y> tiles - 1) {
             System.out.println("Invalid input y, out of bounds");
             return false;
         }
@@ -91,8 +89,7 @@ public class Game {
         }
 
         field[y][x] = player.symbol;
-        lastX=x;
-        lastY=y;
+
 
         return true;
     }
@@ -102,6 +99,5 @@ enum GameState {
     CREATING,
     CREATED,
     PLAYING
-
 }
 
