@@ -98,7 +98,6 @@ public class EchoServerThread implements Runnable
                         }
 
                     }else{
-                        synchronized (game) {game.wait();}
                         game.sendMessage("REMATCH!",player);
                         game.sendMessage("you had symbol X, now you have symbol O", player);
                         player.symbol = Cell.O;
