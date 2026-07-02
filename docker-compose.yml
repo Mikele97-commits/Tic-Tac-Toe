@@ -1,0 +1,38 @@
+
+services:
+  game-server:
+    image: tictactoe
+    container_name: game-server
+    networks:
+      - tic-tac-toe-net
+    command: ["-cp", "app.jar", "EchoServer"]
+    volumes:
+      - game-db-data:/app/data
+    ports:
+      - "6666:6666"
+
+  player-1:
+    image: tictactoe
+    container_name: player-1
+    networks:
+      - tic-tac-toe-net
+    command: ["-cp", "app.jar", "Client", "game-server"]
+    stdin_open: true
+    tty: true
+    depends_on:
+      - game-server
+
+  player-2:
+    image: tictactoe
+    container_name: player-2
+    networks:
+      - tic-tac-toe-net
+    command: ["-cp", "app.jar", "Client", "game-server"]
+    stdin_open: true
+    tty: true
+    depends_on:
+      - game-server
+
+networks:
+  tic-tac-toe-net:
+    driver: bridge

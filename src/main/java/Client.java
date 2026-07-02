@@ -1,6 +1,3 @@
-package echoserver;
-
-
 import java.net.*;
 import java.io.*;
 
@@ -8,8 +5,16 @@ public class Client {
 
     public static void main(String[] args) {
         User user;
-        String host = "localhost";
+        String host;
+        if(args.length > 0){
+            System.out.println("args found, host: " + args[0]);
+            host = args[0];
+        }else {
+            System.out.println("No host specified");
+            host = "localhost";
+        }
         int port = 0;
+
         try {
             port = 6666;
         } catch (NumberFormatException e) {

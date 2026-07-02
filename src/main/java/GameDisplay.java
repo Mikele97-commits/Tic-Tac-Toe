@@ -1,5 +1,3 @@
-package echoserver;
-
 public class GameDisplay {
     static String findState(Cell cell){
         return switch (cell) {

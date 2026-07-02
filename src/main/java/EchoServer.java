@@ -1,7 +1,3 @@
-
-package echoserver;
-
-
 import java.net.*;
 import java.io.*;
 
@@ -9,6 +5,7 @@ public class EchoServer {
     Lobby lobby=new Lobby();
     Game game;
     public void startServer() {
+
         ServerSocket serverSocket = null;
         Socket socket = null;
 

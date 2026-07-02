@@ -1,6 +1,3 @@
-package echoserver;
-
-
 import at.favre.lib.crypto.bcrypt.BCrypt;
 
 import java.net.*;
@@ -9,7 +6,6 @@ import java.util.Properties;
 
 public class EchoServerThread implements Runnable
 {
-    Properties prop = new Properties();
 
     protected Socket socket;
     private final Game game;
@@ -26,11 +22,7 @@ public class EchoServerThread implements Runnable
         BufferedReader brinp;
         DataOutputStream out;
         String threadName = Thread.currentThread().getName();
-        try {
-            prop.load(new FileInputStream("database.db"));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+
 
         //inicjalizacja strumieni
         try{
@@ -217,11 +209,10 @@ public class EchoServerThread implements Runnable
     }
 
     public void login(BufferedReader brinp) throws IOException {
-        prop.load(new FileInputStream("database.db"));
         game.sendMessage("Enter your Username", player);
         String username = brinp.readLine();
         while(true){
-            if(prop.getProperty(username)==null){
+            if(!Database.userExists(username)){
                 game.sendMessage("This username doesn't exist. Try different username", player);
                 username = brinp.readLine();
             }else{
@@ -231,7 +222,7 @@ public class EchoServerThread implements Runnable
         }
         game.sendMessage("Enter your Password", player);
         String password = brinp.readLine();
-        String passAndPoints=prop.getProperty(username);
+        String passAndPoints=Database.giveProp(username);
         String[] split=passAndPoints.split("\\|");
         String pass=split[0];
         int points=Integer.parseInt(split[1]);
@@ -252,7 +243,7 @@ public class EchoServerThread implements Runnable
         game.sendMessage("Enter your Username", player);
         String username = brinp.readLine();
         while(true){
-            if(prop.getProperty(username)!=null){
+            if(Database.userExists(username)){
                 game.sendMessage("This username already registered. Try different username", player);
                 username = brinp.readLine();
             }else{

@@ -1,5 +1,3 @@
-package echoserver;
-
 public class User {
     final String username;
     private int points;

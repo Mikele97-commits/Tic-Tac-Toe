@@ -1,7 +1,10 @@
-package echoserver;
-
 public class CheckVictory {
-
+    /**
+     *<p>Checks all the adjacent tiles, searching for winning line</p>
+     * @param move
+     * @param field
+     * @return The result of game after inputted move. True if victory achieved, otherwise false
+     */
     public static boolean check(String move, Cell[][] field) {
         move = move.toUpperCase();
         String xString = move.substring(0, 1);
